@@ -18,17 +18,20 @@ import static io.restassured.RestAssured.given;
 
 public class RestUtils {
 
-    String baseUri = ConfigManager.readConfigFile("baseUri");
+    String baseUri = ConfigManager.readConfigFile("baseUrl");
+    RequestSpecification requestSpecification;
 
     ResponseSpecification responseSpecification = expect().statusCode(anyOf(equalTo(200),equalTo(201),
-            equalTo(204),equalTo(400)));
+            equalTo(204),equalTo(400),equalTo(404)));
 
-    private RequestSpecification setupRequest(AuthType authType, ContentType contentType){
+    private void setupRequest(AuthType authType, ContentType contentType){
 
         RestAssured.baseURI = baseUri;
 
-        RequestSpecification requestSpecification =
-                given().contentType(contentType);
+        requestSpecification =
+                given()
+                    .log().all()
+                        .contentType(contentType);
 
         switch (authType){
             case BEARER_TOKEN:
@@ -49,7 +52,6 @@ public class RestUtils {
             default:
                 throw new FrameworkException("Incorrect Auth Type passed");
         }
-        return requestSpecification;
 
     }
 
@@ -93,9 +95,10 @@ public class RestUtils {
      */
     public <T>Response performPost(String endpoint, T body, Map<String,String> pathParams, Map<String,String> queryParams, AuthType authType, ContentType contentType){
 
-        applyParams(setupRequest(authType,contentType),pathParams,queryParams);
+        setupRequest(authType,contentType);
+        applyParams(requestSpecification,pathParams,queryParams);
 
-        Response response = setupRequest(authType,contentType).body(body).post(endpoint).then().spec(responseSpecification).extract().response();
+        Response response = requestSpecification.body(body).post(endpoint).then().spec(responseSpecification).extract().response();
         response.prettyPrint();
         return response;
     }
@@ -112,9 +115,10 @@ public class RestUtils {
      */
     public Response performPost(String endpoint, File file, Map<String,String> pathParams, Map<String,String> queryParams, AuthType authType, ContentType contentType){
 
-        applyParams(setupRequest(authType,contentType),pathParams,queryParams);
+        setupRequest(authType,contentType);
+        applyParams(requestSpecification,pathParams,queryParams);
 
-        Response response = setupRequest(authType,contentType).body(file).post(endpoint).then().spec(responseSpecification).extract().response();
+        Response response = requestSpecification.body(file).post(endpoint).then().spec(responseSpecification).extract().response();
         response.prettyPrint();
         return response;
     }
@@ -130,15 +134,79 @@ public class RestUtils {
      */
     public Response performGet(String endpoint, Map<String,String> pathParams, Map<String,String> queryParams, AuthType authType, ContentType contentType){
 
-        applyParams(setupRequest(authType,contentType),pathParams,queryParams);
+        setupRequest(authType,contentType);
+        applyParams(requestSpecification,pathParams,queryParams);
 
-        return setupRequest(authType,contentType).
-                when()
+        return requestSpecification.
+                when().log().all()
                 .get(endpoint)
-                .then()
+                .then().log().all()
                 .spec(responseSpecification)
                 .extract().response();
 
     }
+
+    /**
+     * Generic method to do a put call. This method will be utilised in Test Classes.
+     * @param endpoint
+     * @param body
+     * @param pathParams
+     * @param queryParams
+     * @param authType
+     * @param contentType
+     * @return Returns the Response Object
+     * @param <T>
+     */
+    public <T>Response performPut(String endpoint, T body, Map<String,String> pathParams, Map<String,String> queryParams, AuthType authType, ContentType contentType){
+
+        setupRequest(authType,contentType);
+        applyParams(requestSpecification,pathParams,queryParams);
+
+        Response response = requestSpecification.body(body).put(endpoint).then().spec(responseSpecification).extract().response();
+        response.prettyPrint();
+        return response;
+    }
+
+
+    /**
+     * Generic method to do a patch call. This method will be utilised in Test Classes.
+     * @param endpoint
+     * @param body
+     * @param pathParams
+     * @param queryParams
+     * @param authType
+     * @param contentType
+     * @return Returns the Response Object
+     * @param <T>
+     */
+    public <T>Response performPatch(String endpoint, T body, Map<String,String> pathParams, Map<String,String> queryParams, AuthType authType, ContentType contentType){
+
+        setupRequest(authType,contentType);
+        applyParams(requestSpecification,pathParams,queryParams);
+
+        Response response = requestSpecification.body(body).patch(endpoint).then().spec(responseSpecification).extract().response();
+        response.prettyPrint();
+        return response;
+    }
+
+    /**
+     * Generic method to do a delete call. This method will be utilised in Test Classes.
+     * @param endpoint
+     * @param pathParams
+     * @param queryParams
+     * @param authType
+     * @param contentType
+     * @return Returns the Response Object
+     */
+    public Response performDelete(String endpoint, Map<String,String> pathParams, Map<String,String> queryParams, AuthType authType, ContentType contentType){
+
+        setupRequest(authType,contentType);
+        applyParams(requestSpecification,pathParams,queryParams);
+
+        Response response = requestSpecification.delete(endpoint).then().spec(responseSpecification).extract().response();
+        response.prettyPrint();
+        return response;
+    }
+
 
 }

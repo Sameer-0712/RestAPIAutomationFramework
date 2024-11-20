@@ -6,19 +6,23 @@ import java.util.Properties;
 
 public class ConfigManager {
 
-    static Properties properties = new Properties();
+    private static Properties properties = new Properties();
 
     static{
         try {
             FileInputStream fis = new FileInputStream("./src/test/resources/config.properties");
             properties.load(fis);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 
     public static String readConfigFile(String key){
         return properties.getProperty(key);
+    }
+
+    public static void setConfigFile(String key, String value){
+        properties.setProperty(key,value);
     }
 
 }

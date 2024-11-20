@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Suite" >
+<!--    <test name="GoRest Tests">-->
+<!--        <parameter name="baseUrl" value="https://gorest.co.in" />-->
+<!--        <classes>-->
+<!--            <class name="com.qa.api.tests.GoRestTests"/>-->
+<!--        </classes>-->
+<!--    </test> &lt;!&ndash; Test &ndash;&gt;-->
+
+<!--    <test name="Grocerystore Tests">-->
+<!--        <parameter name="baseUrl" value="https://simple-grocery-store-api.glitch.me" />-->
+<!--        <classes>-->
+<!--            <class name="com.qa.api.tests.GroceryStoreTests"/>-->
+<!--        </classes>-->
+<!--    </test>-->
+
+    <test name="Amadeus Flight Tests">
+        <parameter name="baseUrl" value="https://test.api.amadeus.com" />
+        <classes>
+            <class name="com.qa.api.tests.amadeus.GetFlightDestinationsTest"/>
+        </classes>
+    </test>
+</suite> <!-- Suite -->
